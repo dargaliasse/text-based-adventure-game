@@ -1,0 +1,91 @@
+def the_game():
+    username = input("What is your name? ")
+
+    class Character:
+        def __init__(self, name, species, gender):
+            self.name = name
+            self.species = species
+            self.gender = gender
+
+    class Inventory:
+        def __init__(self, snack, weapon, tool):
+            self.snack = snack
+            self.weapon = weapon
+            self.tool = tool
+
+    def difficulty():
+        print(f"Choose your difficulty:")
+        difficulty_menu = {
+            "1": "1. Easy",
+            "2": "2. Medium",
+            "3": "3. Hard"
+        }
+        for key, value in difficulty_menu.items():
+            print(value)
+
+    def life_allocation(difficulty):
+        if difficulty == "1":
+            return "5"
+        elif difficulty == "2":
+            return "3"
+        elif difficulty == "3":
+            return "1"
+        else:
+            print(
+                "Invalid difficulty. Please choose from the following options: 1. Easy, 2. Medium, 3. Hard"
+            )
+
+
+    def welcome_menu():
+        menu = {
+            "1": "1. Start a new game (START)",
+            "2": "2. Load your progress (LOAD)",
+            "3": "3. Quit the game (QUIT)"
+        }
+        print(f"Welcome to ***Your Game***\n")
+
+        for key, value in menu.items():
+            print(value)
+
+    def start_game():
+        print(f"Starting a new game...")
+        user = input("Enter a username ('/' to go back): ")
+        print(f"Create your character:")
+        name = input("Name: ")
+        species = input("Species: ")
+        gender = input("Gender: ")
+        new_char = Character(name, species, gender)
+        print(f"Pack your bag for the journey:")
+        snack = input("Snack: ")
+        weapon = input("Weapon")
+        tool = input("Tool")
+        char_inventory = Inventory(snack,weapon,tool)
+        difficulty()
+        chosen_difficulty = input("Choose your difficulty: ")
+        print(f"""Good luck on your journey, {username}!
+Your character: {new_char.name}, {new_char.species}, {new_char.gender}
+Your inventory: {char_inventory.snack}, {char_inventory.weapon}, {char_inventory.tool}
+Difficulty: {chosen_difficulty}
+Number of lives: {life_allocation(chosen_difficulty)}
+""")
+
+
+
+    def load_game():
+        print("No saved data found")
+
+    welcome_menu()
+    while True:
+        user_choice = input()
+        if user_choice == "1" or user_choice.lower() == "start":
+            start_game()
+            return
+        elif user_choice == "2" or user_choice.lower() == "load":
+            load_game()
+            return
+        elif user_choice == "3" or user_choice.lower() == "quit":
+            print("Goodbye")
+            return
+        else:
+            print("unknown input! Please enter a valid one.")
+the_game()
