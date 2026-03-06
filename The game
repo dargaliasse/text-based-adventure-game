@@ -1,4 +1,4 @@
-port json
+import json #fixed mistake
 
 with open("data/story.json", "r") as f:
     data = json.load(f)
