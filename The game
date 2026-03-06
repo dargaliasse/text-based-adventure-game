@@ -1,5 +1,10 @@
+port json
+
+with open("data/story.json", "r") as f:
+    data = json.load(f)
+
+
 def the_game():
-    username = input("What is your name? ")
 
     class Character:
         def __init__(self, name, species, gender):
@@ -13,79 +18,137 @@ def the_game():
             self.weapon = weapon
             self.tool = tool
 
-    def difficulty():
-        print(f"Choose your difficulty:")
-        difficulty_menu = {
-            "1": "1. Easy",
-            "2": "2. Medium",
-            "3": "3. Hard"
-        }
-        for key, value in difficulty_menu.items():
-            print(value)
+    class Settings:
+        def __init__(self, difficulty):
+            difficulty = difficulty.lower()
+            self.worded_difficulty = None
+            self.lives = 0
 
-    def life_allocation(difficulty):
-        if difficulty == "1":
-            return "5"
-        elif difficulty == "2":
-            return "3"
-        elif difficulty == "3":
-            return "1"
-        else:
-            print(
-                "Invalid difficulty. Please choose from the following options: 1. Easy, 2. Medium, 3. Hard"
-            )
+            if difficulty in ("1", "easy"):
+                self.worded_difficulty = "easy"
+                self.lives = 5
+            elif difficulty in ("2", "medium"):
+                self.worded_difficulty = "medium"
+                self.lives = 3
+            elif difficulty in ("3", "hard"):
+                self.worded_difficulty = "hard"
+                self.lives = 1
+            else:
+                print("unknown input! Please enter a valid one.")
 
+    class Commands:
+        def __init__(self, character, inventory, lives):
+            self.character = character
+            self.inventory = inventory
+            self.lives = lives
+
+        def run(self, user_command):
+            user_command = user_command.lower()
+
+            if user_command == "/h":
+                print("""Type the number of the option you want to choose.
+Commands you can use:
+/i => Shows inventory.
+/q => Exits the game
+/c => Shows the character traits.
+/h => Shows help.""")
+                return True
+
+            elif user_command == "/i":
+                print(f"Inventory: {self.inventory.snack}, {self.inventory.weapon}, {self.inventory.tool}")
+                return True
+
+            elif user_command == "/c":
+                print(f"Your character: {self.character.name}, {self.character.species}, {self.character.gender}.")
+                print(f"Lives remaining: {self.lives}")
+                return True
+
+            elif user_command == "/q":
+                print("Thanks for playing!")
+                return False
+
+            else:
+                print("Unknown command. Type /h for help.")
+                return True
 
     def welcome_menu():
-        menu = {
-            "1": "1. Start a new game (START)",
-            "2": "2. Load your progress (LOAD)",
-            "3": "3. Quit the game (QUIT)"
-        }
-        print(f"Welcome to ***Your Game***\n")
-
-        for key, value in menu.items():
-            print(value)
+        print("Welcome to ***Your Game***\n")
+        print("1. Start a new game (START)")
+        print("2. Load your progress (LOAD)")
+        print("3. Quit the game (QUIT)")
 
     def start_game():
-        print(f"Starting a new game...")
-        user = input("Enter a username ('/' to go back): ")
-        print(f"Create your character:")
+        user = input("Enter a username ('/b' to go back): ")
+        if user.lower() == "/b":
+            return
+
+        print("Create your character:")
         name = input("Name: ")
         species = input("Species: ")
         gender = input("Gender: ")
         new_char = Character(name, species, gender)
-        print(f"Pack your bag for the journey:")
+
+        print("Pack your bag for the journey:")
         snack = input("Snack: ")
-        weapon = input("Weapon")
-        tool = input("Tool")
-        char_inventory = Inventory(snack,weapon,tool)
-        difficulty()
-        chosen_difficulty = input("Choose your difficulty: ")
-        print(f"""Good luck on your journey, {username}!
+        weapon = input("Weapon: ")
+        tool = input("Tool: ")
+        char_inventory = Inventory(snack, weapon, tool)
+
+        while True:
+            difficulty_choice = input(
+                "Choose your difficulty: \n"
+                "1. Easy\n"
+                "2. Medium\n"
+                "3. Hard\n"
+            )
+            game_settings = Settings(difficulty_choice)
+            if game_settings.worded_difficulty is not None:
+                break
+
+        print(f"""Good luck on your journey, {user}
 Your character: {new_char.name}, {new_char.species}, {new_char.gender}
 Your inventory: {char_inventory.snack}, {char_inventory.weapon}, {char_inventory.tool}
-Difficulty: {chosen_difficulty}
-Number of lives: {life_allocation(chosen_difficulty)}
+Difficulty: {game_settings.worded_difficulty}
+Number of lives: {game_settings.lives}
 """)
 
+        commands = Commands(new_char, char_inventory, game_settings.lives)
 
+        while True:
+            user_input = input()
+
+            if user_input.startswith("/"):
+                keep_command_mode = commands.run(user_input)
+                if not keep_command_mode:
+                    return "quit"  # <-- propagate quit signal
+                continue
+
+            print(user_input)
 
     def load_game():
         print("No saved data found")
 
     welcome_menu()
+
     while True:
-        user_choice = input()
-        if user_choice == "1" or user_choice.lower() == "start":
-            start_game()
-            return
-        elif user_choice == "2" or user_choice.lower() == "load":
+        user_choice = input().lower()
+
+        if user_choice in ("1", "start"):
+            print("starting a new game")
+            result = start_game()  # <-- capture result
+            if result == "quit":
+                return  # <-- exit entirely, no menu reprint
+            welcome_menu()
+
+        elif user_choice in ("2", "load"):
             load_game()
-            return
-        elif user_choice == "3" or user_choice.lower() == "quit":
+
+        elif user_choice in ("3", "quit"):
             print("Goodbye")
             return
+
         else:
             print("unknown input! Please enter a valid one.")
+
+
 the_game()
